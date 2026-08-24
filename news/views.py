@@ -1,7 +1,10 @@
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from django.http import HttpResponse
+from django.core.management import call_command
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from .models import Article, ReadingHistory
@@ -53,6 +56,16 @@ def clear_history(request):
     return redirect('reading_history')
 
 
+def refresh_articles(request, secret):
+    expected_secret = os.environ.get('REFRESH_SECRET')
+
+    if not expected_secret or secret != expected_secret:
+        return HttpResponse("Forbidden", status=403)
+
+    call_command('fetch_news')
+    return HttpResponse("Articles refreshed successfully.")
+
+
 def get_recommendations(user, top_n=5):
     all_articles = list(Article.objects.all())
 
@@ -69,23 +82,3 @@ def get_recommendations(user, top_n=5):
     texts = [f"{a.title} {a.summary}" for a in all_articles]
 
     vectorizer = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = vectorizer.fit_transform(texts)
-
-    read_indexes = [i for i, a in enumerate(all_articles) if a.id in read_ids]
-
-    if not read_indexes:
-        return []
-
-    user_profile = tfidf_matrix[read_indexes].mean(axis=0)
-    user_profile = user_profile.A
-
-    similarities = cosine_similarity(user_profile, tfidf_matrix)[0]
-
-    scored = [
-        (all_articles[i], similarities[i])
-        for i in range(len(all_articles))
-        if all_articles[i].id not in read_ids
-    ]
-    scored.sort(key=lambda pair: pair[1], reverse=True)
-
-    return [article for article, score in scored[:top_n]]
