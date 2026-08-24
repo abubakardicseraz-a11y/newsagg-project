@@ -1,0 +1,26 @@
+{% extends 'news/base.html' %}
+{% block title %}My Reading History{% endblock %}
+{% block content %}
+
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+    <h1 style="font-size: 28px; font-weight: 600; margin: 0;">My Reading History</h1>
+    {% if history %}
+        <form method="post" action="{% url 'clear_history' %}" onsubmit="return confirm('Clear your entire reading history? This cannot be undone.');">
+            {% csrf_token %}
+            <button type="submit" class="link-btn" style="border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px; color: var(--text-secondary);">Clear history</button>
+        </form>
+    {% endif %}
+</div>
+<div style="border-top: 2px solid var(--text); margin: 16px 0 8px;"></div>
+
+{% for entry in history %}
+    <div class="article-card">
+        <span class="source-badge" style="background: {{ entry.article.badge_color }};">{{ entry.article.source }}</span>
+        <h3><a href="{% url 'article_detail' entry.article.id %}">{{ entry.article.title }}</a></h3>
+        <div class="article-summary" style="font-size: 13px; color: var(--text-secondary); font-family: var(--font-sans);">read {{ entry.read_at|date:"M d, Y H:i" }}</div>
+    </div>
+{% empty %}
+    <p>You haven't read anything yet.</p>
+{% endfor %}
+
+{% endblock %}

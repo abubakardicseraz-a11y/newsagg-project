@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}The Feed{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8F3;
+    --surface: #FFFFFF;
+    --accent-soft: #F3EEE2;
+    --text: #1F1C18;
+    --text-secondary: #79746A;
+    --border: #E0DBCE;
+    --accent: #A13D2C;
+    --font-serif: 'Lora', Georgia, serif;
+    --font-sans: 'Inter', -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-serif);
+    line-height: 1.6;
+  }
+  a { color: inherit; }
+
+  .masthead {
+    background: linear-gradient(115deg, #2B2560 0%, #6C3E9E 45%, #C24E5A 100%);
+    padding-bottom: 22px;
+  }
+  .masthead-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 30px 20px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .nameplate {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    color: #FFFFFF;
+  }
+  .tagline {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+    margin-top: 2px;
+  }
+  nav {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: rgba(255,255,255,0.85);
+  }
+  nav a { text-decoration: none; }
+  nav a:hover { color: #FFFFFF; }
+  .nav-user { color: #FFFFFF; font-weight: 500; }
+  .btn-outline {
+    border: 1px solid rgba(255,255,255,0.6);
+    padding: 6px 14px;
+    border-radius: 4px;
+    text-decoration: none !important;
+    color: #FFFFFF;
+  }
+  .btn-outline:hover { background: #FFFFFF; color: #2B2560 !important; }
+  .link-btn {
+    background: none; border: none; cursor: pointer;
+    font-family: var(--font-sans); font-size: 13px; color: rgba(255,255,255,0.85);
+    padding: 0;
+  }
+  .link-btn:hover { color: #FFFFFF; }
+  .inline-form { display: inline; }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+  }
+  .section-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin: 40px 0 16px;
+  }
+  .section-label:first-child { margin-top: 0; }
+  .recommended-block {
+    background: var(--accent-soft);
+    border-radius: 10px;
+    padding: 22px;
+    border: 1px solid #E8DCC8;
+  }
+  .article-card {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .article-card:last-child { border-bottom: none; }
+  .recommended-block .article-card { padding: 16px 0; }
+  .article-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+  .article-card h3 a { text-decoration: none; }
+  .article-card h3 a:hover { color: var(--accent); }
+  .article-summary {
+    font-size: 16px;
+    color: #3A3630;
+  }
+  .rec-tag {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: 2px 6px;
+    margin-bottom: 10px;
+  }
+
+  .source-badge {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    border-radius: 20px;
+    padding: 3px 10px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div>
+        <a href="{% url 'home' %}" class="nameplate">The Feed</a>
+        <div class="tagline">Personalized &middot; Minimal &middot; Yours</div>
+      </div>
+      <nav>
+        {% if user.is_authenticated %}
+          <span class="nav-user">{{ user.username }}</span>
+          <a href="{% url 'reading_history' %}">History</a>
+          <form method="post" action="{% url 'logout' %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit" class="link-btn">Log out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}">Log in</a>
+          <a href="{% url 'signup' %}" class="btn-outline">Sign up</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

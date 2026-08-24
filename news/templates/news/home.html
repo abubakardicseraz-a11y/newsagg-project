@@ -1,0 +1,30 @@
+{% extends 'news/base.html' %}
+{% block title %}The Feed{% endblock %}
+{% block content %}
+
+{% if recommended %}
+    <div class="section-label">Recommended for you</div>
+    <div class="recommended-block">
+        {% for article in recommended %}
+            <div class="article-card">
+                <span class="rec-tag">Pick</span>
+                <div><span class="source-badge" style="background: {{ article.badge_color }};">{{ article.source }}</span></div>
+                <h3><a href="{% url 'article_detail' article.id %}">{{ article.title }}</a></h3>
+                <div class="article-summary">{{ article.summary|striptags|truncatewords:25 }}</div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="section-label">Latest</div>
+{% for article in articles %}
+    <div class="article-card">
+        <span class="source-badge" style="background: {{ article.badge_color }};">{{ article.source }}</span>
+        <h3><a href="{% url 'article_detail' article.id %}">{{ article.title }}</a></h3>
+        <div class="article-summary">{{ article.summary|striptags|truncatewords:30 }}</div>
+    </div>
+{% empty %}
+    <p>No articles yet.</p>
+{% endfor %}
+
+{% endblock %}
